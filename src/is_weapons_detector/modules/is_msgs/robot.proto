@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package is.robot;
+
+option java_package = "com.is.robot";
+option java_multiple_files = true;
+
+import "is_msgs/common.proto";
+import "google/protobuf/timestamp.proto";
+
+// Define messages for the robot gateway and controller services
+
+message RangeScan {
+  repeated float angles = 1;
+  repeated float ranges = 2;
+}
+
+message RobotConfig { common.Speed speed = 1; }
+
+message BasicMoveTask {
+  // (Optional) List of positions indicating the desired path.
+  repeated common.Position positions = 1;
+  /* (Optional) List of speeds to be executed at each respective position of a
+   * trajectory. If present, should have the same size as the positions field.
+   */
+  repeated common.Speed speeds = 2;
+  // (Optional) Desired orientation of the robot after finishing the task.
+  common.Orientation final_orientation = 3;
+  /* (Required) Error value where the controller can consider that the point was
+   * reached successfully. */
+  float allowed_error = 4;
+  // (Required) Controller loop frequency in hertz.
+  float rate = 5;
+}
+
+message RobotTaskRequest {
+  // (Optional) Task id, if none is provided one will be generated.
+  uint64 id = 1;
+
+  oneof Task { BasicMoveTask basic_move_task = 2; }
+}
+
+message RobotTaskReply {
+  // Unique identifier of the task.
+  uint64 id = 1;
+}
+
+message RobotControllerProgress {
+  // Unique identifier of the task.
+  uint64 id = 9;
+  // Speed command sent to the robot in order to make the current pose equals to
+  // the desired one.
+  common.Speed current_speed = 1;
+  // Pose where the robot actually is.
+  common.Pose current_pose = 2;
+  // Pose where the robot should be now.
+  common.Pose desired_pose = 3;
+  // Robot positioning error for the current task.
+  float error = 4;
+  // Percentage indicating how much of the task has been completed yet.
+  float completion = 5;
+  // Sources used to locate the robot.
+  repeated string sources = 6;
+  // Timestamp of when the task started.
+  google.protobuf.Timestamp begin = 7;
+  // Timestamp of when the task finished.
+  google.protobuf.Timestamp end = 8;
+}

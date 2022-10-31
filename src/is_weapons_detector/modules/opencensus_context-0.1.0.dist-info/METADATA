@@ -1,0 +1,32 @@
+Metadata-Version: 2.1
+Name: opencensus-context
+Version: 0.1.0
+Summary: OpenCensus Runtime Context
+Home-page: https://github.com/census-instrumentation/opencensus-python/tree/master/context/opencensus-context
+Author: OpenCensus Authors
+Author-email: census-developers@googlegroups.com
+License: Apache-2.0
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Dist: contextvars ; python_version >= "3.6" and python_version < "3.7"
+
+OpenCensus Runtime Context
+============================================================================
+
+|pypi|
+
+.. |pypi| image:: https://badge.fury.io/py/opencensus-context.svg
+   :target: https://pypi.org/project/opencensus-context/
+
+

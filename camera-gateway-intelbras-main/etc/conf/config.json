@@ -1,0 +1,15 @@
+{
+    "broker_uri": "amqp://rabbitmq.default",
+    "camera": {
+        "id": "1",
+        "ip": "10.10.10.1",
+        "rtsp_port": "554",
+	    "http_port":80,
+        "user": "admin",
+        "password": "ifes1234",
+        "stream_channel": 0,
+        "channel": 1,
+        "zipkin_host":"10.10.2.7",
+        "zipkin_port":30200
+    }
+}

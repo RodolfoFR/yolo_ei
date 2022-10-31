@@ -1,0 +1,13 @@
+Como não tem como comentar em arquivo .json, aqui serve para isso
+
+------------------------------------------------------------------
+options.json:
+de /home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/etc/conf
+
+troquei: "broker_uri": "amqp://10.10.2.30:30000"
+por: "broker_uri": "amqp://guest:guest@localhost:5672"
+
+Coloquei em model os parametros em ordem(correta), igual no arquivo da classe model do 
+arquivo /home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/conf/options.proto
+
+------------------------------------------------------------------

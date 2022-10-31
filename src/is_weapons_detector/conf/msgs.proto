@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+
+message Image {
+  bytes data = 1;
+  uint32 camera_id = 2;
+  uint32 timestamp = 3;
+  uint32 frame_id = 4;
+  Resolution resolution = 5;
+  ObjectAnnotations annotations = 6;
+}
+
+message ObjectAnnotations {
+  repeated ObjectAnnotation objects = 1;
+}
+
+message ObjectAnnotation {
+  string label = 1;
+  int64 id = 2;
+  float score = 3;
+  BoundingPoly region = 4;
+  repeated PointAnnotation keypoints = 5;
+}
+
+
+message PointAnnotation {
+  int64 id = 1;
+  float score = 2;
+  Vertex position = 3;
+}
+
+message BoundingPoly {
+  repeated Vertex vertices = 1;
+}
+
+message Vertex {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Resolution {
+  uint32 height = 1;
+  uint32 width = 2;
+}

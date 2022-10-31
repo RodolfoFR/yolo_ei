@@ -1,0 +1,9 @@
+is-msgs
+av
+is-wire
+ffmpeg-python
+opencv_python==4.1.1.26
+numpy==1.17.2
+vine==1.3.0
+requests
+opencensus-ext-zipkin==0.2.1

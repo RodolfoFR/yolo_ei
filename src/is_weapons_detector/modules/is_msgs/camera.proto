@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package is.vision;
+
+option java_package = "com.is.vision";
+option java_multiple_files = true;
+
+import "is_msgs/common.proto";
+import "is_msgs/image.proto";
+import "is_msgs/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+// Define messages for the camera gateway and calibration services
+
+message CameraSetting {
+  // True if the camera should automatically assign this parameter.
+  bool automatic = 1;
+  // Ratio assigned to the parameter where 0.0 is the lowest value and 1.0 the highest.
+  float ratio = 2 [(validate.rules).float = { gte: 0.0, lte: 1.0 }];
+}
+
+message CameraSettings {
+  CameraSetting brightness = 1;
+  CameraSetting exposure = 2;
+  CameraSetting focus = 3;
+  CameraSetting gain = 4;
+  CameraSetting gamma = 5;
+  CameraSetting hue = 6;
+  CameraSetting iris = 7;
+  CameraSetting saturation = 8;
+  CameraSetting sharpness = 9;
+  CameraSetting shutter = 10;
+  CameraSetting white_balance_bu = 11;
+  CameraSetting white_balance_rv = 12;
+  CameraSetting zoom = 13;
+}
+
+// Camera parameters.
+message CameraConfig {
+  // Sampling parameters.
+  common.SamplingSettings sampling = 1;
+  // Image parameters.
+  ImageSettings image = 2;
+  // Internal camera parameters.
+  CameraSettings camera = 3;
+  // Stream parameter
+  google.protobuf.Int64Value stream_channel_id = 4;
+}
+
+/* Request selector/filter for CameraSettings. Used to select what fields
+   should be present in an CameraConfig GET request.
+   See [FieldSelector](#is.common.FieldSelector) for more information. */
+enum CameraConfigFields {
+  // Fill everything.
+  ALL = 0;
+  // Fill sampling settings.
+  SAMPLING_SETTINGS = 1;
+  // Fill image settings.
+  IMAGE_SETTINGS = 2;
+  // Fill camera settings.
+  CAMERA_SETTINGS  = 3; 
+  // Fill stream channel settings
+  STREAM_CHANNEL_ID = 4;
+}
+
+// Models the calibration parameters of a camera.
+message CameraCalibration {
+  // Camera id.
+  int64 id = 1;  
+  // When the calibration was performed.
+  google.protobuf.Timestamp calibrated_at = 2; 
+  // Average reprojection error.
+  double error = 3; 
+  // Resolution used during calibration.
+  vision.Resolution resolution = 4; 
+  // Intrinsic matrix with shape=[3,3].
+  common.Tensor intrinsic = 5; 
+  // Distortion coefficients with shape=[1,5].
+  common.Tensor distortion = 6; 
+  /* Extrinsic tranformations. Used to transform from the camera frame to a world frame 
+     and vice versa. */
+  repeated FrameTransformation extrinsic = 7;
+}
+
+// Represent the tranformation between two coordinate systems.
+message FrameTransformation {
+  // Id of the "from" frame.
+  int64 from = 1;
+  // Id of the "to" frame.
+  int64 to = 2;
+  // Transformation matrix [R T; 0 1] with shape = [4,4].
+  common.Tensor tf = 3; 
+  /* Timepoint where this transformation is still valid. If not present the transformation will be 
+     considered to be valid forever. */
+  google.protobuf.Timestamp expiration = 4;
+}
+
+message FrameTransformations {
+  // List of transformations.
+  repeated FrameTransformation tfs = 1;
+}
+
+message IdPair {
+  int64 from = 1;
+  int64 to = 2;
+}
+
+message GetTransformationRequest {
+  // Sequence of pairs (from -> to) describing the desired transformations
+  repeated IdPair ids = 1;
+}
+
+message GetTransformationReply {
+  // Sequence of transformations relative to the requested ids.
+  repeated is.vision.FrameTransformation transformations = 1;
+}
+
+message AddTransformationRequest {
+}
+
+message AddTransformationReply {
+}
+
+message GetCalibrationRequest {
+  // IDs of the cameras to return the calibration from.
+  repeated int64 ids = 1;
+}
+
+message GetCalibrationReply {
+  // Sequence of calibrations relative to the requested IDs.
+  repeated is.vision.CameraCalibration calibrations = 1;
+}

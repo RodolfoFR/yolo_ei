@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/modules/is_msgs/camera.proto";
+
+// Service Configuration
+message WeaponDetectorOptions {
+    string broker_uri = 1;
+    string zipkin_uri = 2;
+    YoloModel model  = 3;
+    repeated CameraSetup cameras = 4;
+
+}
+
+
+message YoloModel {
+    string people_detection_model = 1;
+    string weapon_model_file = 2;
+    float people_nms_conf = 3;
+    float weapon_nms_conf  = 4;
+    uint32 people_infer_img_size = 5;
+    uint32 weapon_infer_img_size = 6;
+    repeated string weapon_class_names = 7;
+    uint32 gpu = 8;
+    uint32 increase_image_percent = 9;
+}
+
+message CameraSetup {
+  int64 id = 1;
+  is.vision.CameraConfig config = 2;
+}
+

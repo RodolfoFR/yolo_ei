@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-cam-gateway
+  namespace: default
+data:
+  intelbras-cam-1: |-
+    {
+    "broker_uri": "amqp://rabbitmq.default",
+    "camera": {
+        "id": "1",
+        "ip": "10.10.10.1",
+        "rtsp_port": "554",
+        "http_port":80,
+        "user": "admin",
+        "password": "ifes1234",
+        "stream_channel": 0,
+        "channel": 1,
+        "zipkin_url":"10.10.2.30",
+        "zipkin_port":30200
+      }
+    }
+  intelbras-cam-2: |-
+    {
+    "broker_uri": "amqp://rabbitmq.default",
+    "camera": {
+        "id": "2",
+        "ip": "10.10.10.2",
+        "rtsp_port": "554",
+        "http_port":80,
+        "user": "admin",
+        "password": "ifes1234",
+        "stream_channel": 0,
+        "channel": 1,
+        "zipkin_url":"10.10.2.30",
+        "zipkin_port":30200
+      }
+    }
+  intelbras-cam-3: |-
+    {
+    "broker_uri": "amqp://rabbitmq.default",
+    "camera": {
+        "id": "3",
+        "ip": "10.10.10.3",
+        "rtsp_port": "554",
+        "http_port":80,
+        "user": "admin",
+        "password": "ifes1234",
+        "stream_channel": 0,
+        "channel": 1,
+        "zipkin_url":"10.10.2.30",
+        "zipkin_port":30200
+      }
+    }
+  intelbras-cam-4: |-
+    {
+    "broker_uri": "amqp://rabbitmq.default",
+    "camera": {
+        "id": "4",
+        "ip": "10.10.10.4",
+        "rtsp_port": "554",
+        "http_port":80,
+        "user": "admin",
+        "password": "ifes1234",
+        "stream_channel": 0,
+        "channel": 1,
+        "zipkin_url":"10.10.2.30",
+        "zipkin_port":30200
+      }
+    }
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "intelbras-camera-1"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: intelbras-cam-1
+    spec:
+      hostNetwork: true
+      dnsPolicy: "ClusterFirstWithHostNet"
+      containers:
+        - name: camera-1
+          image: labvisio/intelbras-camera-gateway:v1.0
+          command: ["python"]
+          args: ["service.py", "../etc/conf/options.json"]
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          volumeMounts:
+            - name: options
+              mountPath: /opt/intelbras/etc/conf/
+      volumes:
+        - name: options
+          configMap:
+            name: configmap-cam-gateway
+            items:
+              - key: intelbras-cam-1
+                path: options.json
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "intelbras-camera-2"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: intelbras-cam-2
+    spec:
+      hostNetwork: true
+      dnsPolicy: "ClusterFirstWithHostNet"
+      containers:
+        - name: camera-2
+          image: labvisio/intelbras-camera-gateway:v1.0
+          command: ["python"]
+          args: ["service.py", "../etc/conf/options.json"]
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: options
+              mountPath: /opt/intelbras/etc/conf/
+      volumes:
+        - name: options
+          configMap:
+            name: configmap-cam-gateway
+            items:
+              - key: intelbras-cam-2
+                path: options.json
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "intelbras-camera-3"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: intelbras-cam-3
+    spec:
+      hostNetwork: true
+      dnsPolicy: "ClusterFirstWithHostNet"
+      containers:
+        - name: camera-3
+          image: labvisio/intelbras-camera-gateway:v1.0
+          command: ["python"]
+          args: ["service.py", "../etc/conf/options.json"]
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          volumeMounts:
+            - name: options
+              mountPath: /opt/intelbras/etc/conf/
+      volumes:
+        - name: options
+          configMap:
+            name: configmap-cam-gateway
+            items:
+              - key: intelbras-cam-3
+                path: options.json
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "intelbras-camera-4"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: intelbras-cam-4
+    spec:
+      hostNetwork: true
+      dnsPolicy: "ClusterFirstWithHostNet"
+      containers:
+        - name: camera-4
+          image: labvisio/intelbras-camera-gateway:v1.0
+          command: ["python"]
+          args: ["service.py", "../etc/conf/options.json"]
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          volumeMounts:
+            - name: options
+              mountPath: /opt/intelbras/etc/conf/
+      volumes:
+        - name: options
+          configMap:
+            name: configmap-cam-gateway
+            items:
+              - key: intelbras-cam-4
+                path: options.json

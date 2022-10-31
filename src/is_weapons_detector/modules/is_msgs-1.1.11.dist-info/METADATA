@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: is-msgs
+Version: 1.1.11
+Summary: Package with standard IS messages
+Home-page: http://github.com/labviros/is-msgs
+Author: labviros
+License: MIT
+Platform: UNKNOWN
+Requires-Dist: protobuf (==3.6.0)
+
+UNKNOWN
+
+

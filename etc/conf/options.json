@@ -1,0 +1,125 @@
+{
+    "broker_uri": "amqp://guest:guest@localhost:5672", 
+    "zipkin_uri": "http://zipkin.default:9411",
+    "model": {
+            "people_detection_model": "yolov5m6",
+            "weapon_model_file": "/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/yolov5s.pt",
+            "people_nms_conf": 0.1,
+            "weapon_nms_conf":0.4,
+            "people_infer_img_size":1280,
+            "weapon_infer_img_size":1280,
+            "weapon_class_names": ["Arma", "Pessoa Armada"],
+            "gpu":0,
+            "increase_image_percent":40
+    },
+    "cameras": [
+        {
+          "id": 0,
+          "config": {
+            "sampling": {
+              "frequency": 10.0
+            },
+            "image": {
+              "resolution": {
+                "width": 1288,
+                "height": 728
+              },
+              "color_space": {
+                "value": "GRAY"
+              },
+              "format": {
+                "format": "JPEG",
+                "compression": 0.9
+              }
+            },
+            "camera": {
+              "shutter": {
+                "ratio": 0.2,
+                "automatic": false
+              }
+            }
+          }
+        },
+        {
+          "id": 1,
+          "config": {
+            "sampling": {
+              "frequency": 10.0
+            },
+            "image": {
+              "resolution": {
+                "width": 1288,
+                "height": 728
+              },
+              "color_space": {
+                "value": "GRAY"
+              },
+              "format": {
+                "format": "JPEG",
+                "compression": 0.9
+              }
+            },
+            "camera": {
+              "shutter": {
+                "ratio": 0.2,
+                "automatic": false
+              }
+            }
+          }
+        },
+        {
+          "id": 2,
+          "config": {
+            "sampling": {
+              "frequency": 10.0
+            },
+            "image": {
+              "resolution": {
+                "width": 1288,
+                "height": 728
+              },
+              "color_space": {
+                "value": "GRAY"
+              },
+              "format": {
+                "format": "JPEG",
+                "compression": 0.9
+              }
+            },
+            "camera": {
+              "shutter": {
+                "ratio": 0.2,
+                "automatic": false
+              }
+            }
+          }
+        },
+        {
+          "id": 3,
+          "config": {
+            "sampling": {
+              "frequency": 10.0
+            },
+            "image": {
+              "resolution": {
+                "width": 1288,
+                "height": 728
+              },
+              "color_space": {
+                "value": "GRAY"
+              },
+              "format": {
+                "format": "JPEG",
+                "compression": 0.9
+              }
+            },
+            "camera": {
+              "shutter": {
+                "ratio": 0.2,
+                "automatic": false
+              }
+            }
+          }
+        }
+      ]
+}
