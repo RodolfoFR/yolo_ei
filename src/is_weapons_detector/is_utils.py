@@ -89,7 +89,7 @@ def load_options():
     # Se sys.arv tiver algum arguemento, então op_file é primeiro argumento da chamada
     # Se não op_file é o arquivo options.json que está em etc/conf
     # op_file é para ser um arq que passa ip das cameras(espaço), ip do zipkin_uri e os paramentros do modelo
-    op_file = sys.argv[1] if len(sys.argv) > 1 else '/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/etc/conf/options.json'
+    op_file = sys.argv[1] if len(sys.argv) > 1 else '/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/etc/conf/options.json'
    
     try:
     # f = op_file, f abre op_file para leitura
@@ -100,8 +100,8 @@ def load_options():
                 op = Parse(f.read(), WeaponDetectorOptions())
                 # faz o log info que passar a variavel op
                 log.info('WeaponDetectorOptions: \n{}', op)
-                # devolver a variavel op que é da classe WeaponDetectorOptions
                 return op
+            # se o arquivo json m estiver no formato da classe WeaponDetectorOptions ele retorna mensagem de erro
             except Exception as ex:
                 log.critical('Unable to load options from \'{}\'. \n{}', op_file, ex)
     except Exception as ex:
