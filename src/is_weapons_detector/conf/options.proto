@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/struct.proto";
-import "/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/modules/is_msgs/camera.proto";
+import "is_msgs/camera.proto";
 
 // Service Configuration
 message WeaponDetectorOptions {

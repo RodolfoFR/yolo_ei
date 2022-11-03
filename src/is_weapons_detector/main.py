@@ -1,5 +1,6 @@
 import os
 import sys
+import cv2
 
 import dateutil.parser as dp
 
@@ -60,6 +61,7 @@ def main():
 
     images_data = {}
     n_sample = 0
+    display_rate = 2
     
     while True:
    
@@ -78,6 +80,7 @@ def main():
             # transforma a imagem em numpy
             im_np = to_np(im)
 
+
         with tracer.span(name='detection') as _span:
             # pega o topic da mensagem e dividi ela
             # retorna só o numero do id (0, 1, 2, 3), se estiver correta a formatação
@@ -87,13 +90,20 @@ def main():
             images_data[camera_id] = im_np
             # classificar a imagem (formato numpy)
             
-            weapons = detector.detect(im_np) # retorna a coordenada da pessoa com arama, ou a propria arma,
+            #weapons = detector.detect(im_np) # retorna a coordenada da pessoa com arama, ou a propria arma,
+            weapons = []
             detection_span = _span
 
             if len(images_data) == len(op.cameras):
                 for c in op.cameras:
                     n_sample += 1
                     log.info('Have {} cameras here', n_sample)
+
+                if n_sample % display_rate == 0:
+                    images = [
+                        cv2.imdecode(data, cv2.IMREAD_COLOR)
+                        for _, data in images_data.items()
+                    ]
 
         with tracer.span(name='image_and_annotation_publish'):
             # é a anotação da imagem classifica, de aonde está o objeto classificad, a precisão e a classe dele
@@ -109,7 +119,7 @@ def main():
         tracer.end_span()
 
         info = {
-            'detections': len(weapons),
+            'detections': weapons,
             'dropped_messages': dropped,
             'took_ms': {
                 'detection': round(span_duration_ms(detection_span), 2),
