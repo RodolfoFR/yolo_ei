@@ -108,6 +108,18 @@ def load_options():
         log.critical('Unable to open file \'{}\'', op_file)
 
 def to_np(input_image):
+
+    """  
+    Args: 
+        input_image (np.ndarray or Image(is_msgs))
+    
+    Description:
+        Tranforma a entrada em uma saída do tipo array numpy (no formato imagem, dimensionada)
+
+    Returns:
+        output_image (np.ndarray)
+    """
+
     if isinstance(input_image, np.ndarray):
         output_image = input_image
     elif isinstance(input_image, Image):
