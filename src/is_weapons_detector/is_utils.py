@@ -243,3 +243,31 @@ def prepare_to_display(img, new_shape=(640, 640), color=114, title = None, borde
         shift = border//2+1
         cv2.rectangle(img_border,(shift,shift),(new_shape[0]-shift,new_shape[1]-shift), border_color, int(border) )
     return img_border, ratio, (dw, dh)
+
+# create a bounfing box in the frame, according yolo prediction
+# frame for display with cv2
+def bounding_box(frame, detections, class_names, infer_conf):
+
+    if len(detections) > 0:
+        for xmin, ymin, xmax, ymax, conf, clf in detections:
+
+            if conf > infer_conf:
+
+                xmin = int(xmin)
+                ymin = int(ymin)
+                xmax = int(xmax)
+                ymax = int(ymax)
+
+
+                label = class_names[0] if clf == 0 else class_names[1]
+                color  = (0,150,0) if label == "pessoa" else (0,0,150) if label == "Arma" else (150,0,0)
+                min_point = (xmin, ymin)
+                max_point = (xmax, ymax)
+                
+                frame = cv2.rectangle(frame, min_point, max_point, color, 2)
+                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+
+    return frame
+
+
+

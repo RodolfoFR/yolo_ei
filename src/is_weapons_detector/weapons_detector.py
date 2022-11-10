@@ -87,7 +87,7 @@ class WeaponsDetector:
         # basicamente people_dectector carrga um modelo para detectar pessoas
         # esse modelo é do pessoal da yolo, vem de torch.hub
         # WeaponsDetector.people_detector
-        self.people_detector = torch.hub.load('ultralytics/yolov5', "yolov5s",autoshape=False, pretrained=True, force_reload=True)
+        self.people_detector = torch.hub.load('ultralytics/yolov5', "yolov5s",autoshape=True, pretrained=True, force_reload=True)
        
         # people_detector só tem uma classe que deve se pessoa
         # WeaponsDetector.people_detector.classes
@@ -113,7 +113,7 @@ class WeaponsDetector:
         # acho que ele pega do proprio git deles o arquivos de pesos, usa o modelo 'custom' da yolo
         # WeaponsDetector.weapons_detector
         # self.weapons_detector = torch.hub.load('ultralytics/yolov5',"custom", model_conf.weapon_model_file, force_reload=True), estava assim antes
-        self.weapons_detector = torch.hub.load('ultralytics/yolov5', "yolov5s",autoshape=False, pretrained=True, force_reload=True)
+        self.weapons_detector = torch.hub.load('ultralytics/yolov5', "yolov5s", autoshape=True, pretrained=True, force_reload=True)
        
         # weapons_detector seria a classe do modelo, 2, armas de fogo e facas ?
         # WeaponsDetector.weapons_detector.classes
@@ -145,10 +145,11 @@ class WeaponsDetector:
                 detections = np.concatenate([detections,det])
         return detections
        
+    
+    def detect_people(self, image, infer_size):
 
-    def __detect_people(self, image):
-        people = self.people_detector(image, self.people_infer_img_size)
-        people = np.array(people.xyxy[0].cpu().numpy()).astype(int)
+        people = self.people_detector(image, infer_size)
+        people = np.array(people.xyxy[0].cpu().numpy()) #.astype(int)
         return people
 
     def __detect_weapons(self, image):
@@ -165,7 +166,6 @@ class WeaponsDetector:
 
     def detect(self, image):
        
-        # people = self.__detect_people(image)
         weapons = self.__detect_weapons(image)
        
         # print(people.shape,weapons.shape)
@@ -175,4 +175,9 @@ class WeaponsDetector:
         weapons = weapons.reshape(-1,6)
         weapons[...,-1] += 1
         return weapons
+
+    def verification_gpu(self):
+
+        print(f'cuda is {torch.cuda.is_available()}')
+        
 

@@ -2,6 +2,7 @@ import os
 import sys
 import cv2
 import numpy as np
+from torch import cuda
 
 import dateutil.parser as dp
 
@@ -11,7 +12,7 @@ from is_msgs.image_pb2 import Image
 from is_wire.core import Logger, Subscription, Message, Tracer
 
 from weapons_detector import WeaponsDetector
-from is_utils import load_options, create_exporter, get_topic_id,  to_image, to_np, annotate_image
+from is_utils import load_options, create_exporter, get_topic_id,  to_image, to_np, annotate_image, bounding_box
 from stream_channel import StreamChannel
 
 
@@ -46,7 +47,7 @@ def main():
    
     # detector vai ser da classe WeaponsDetector que vem de weapons_detector.py, Rede para classificar
     # que tem como parametro op.model, que sao os parametro do modelo (vai ter os pesos)
-    #detector = WeaponsDetector(op.model)
+    detector = WeaponsDetector(op.model)
 
     # StreamChannel é uma classe que vem de stream_channel.py
     # é parecido com Channel do is_wire.core
@@ -80,9 +81,19 @@ def main():
     n_sample = 0
     display_rate = 4
     first = 0
-    rod = 0
+    rod = False
+    id_image_save = 0
+
+    gpu_activated = cuda.is_available() 
+
+    if not gpu_activated:
+        log.info('GPU is not enabled for this program')
+    else:
+        log.info('GPU is enabled for this program')
+
+
     
-    while True:
+    while gpu_activated:
    
     # parametro return_dropped=True serve além de receber a messagem receber o dropped
     # consume a mensagem  
@@ -114,7 +125,7 @@ def main():
             
             
             #weapons = detector.detect(im_np) # retorna a coordenada da pessoa com arama, ou a propria arma,
-            weapons = []
+            
             detection_span = _span
 
             if len(images_data) == len(op.cameras):
@@ -132,9 +143,21 @@ def main():
                    
                     place_images(full_image, images) # reajusta o full_image para receber as imagens
                     display_image = cv2.resize(full_image, (0, 0), fx=0.5, fy=0.5)
-                    cv2.imshow('', display_image)
+
+                    infer_size = display_image.shape[1]
+                    infer_size = int(infer_size / 2)
+                    
+                    
+
+                    detection = detector.detect_people(display_image, infer_size)
+
+                    display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+
+            
+                    cv2.imshow('YOLO', display_image)
 
                     key = cv2.waitKey(1)
+
 
                     if key == ord('q'):
                         break
