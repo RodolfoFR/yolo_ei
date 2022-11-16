@@ -2,6 +2,7 @@ import os
 import sys
 import cv2
 import numpy as np
+import time
 from torch import cuda
 
 import dateutil.parser as dp
@@ -87,9 +88,9 @@ def main():
     gpu_activated = cuda.is_available() 
 
     if not gpu_activated:
-        log.info('GPU is not enabled for this program')
+        log.info('GPU is not enabled')
     else:
-        log.info('GPU is enabled for this program')
+        log.info('GPU is enabled')
 
 
     
@@ -157,6 +158,13 @@ def main():
                     cv2.imshow('YOLO', display_image)
 
                     key = cv2.waitKey(1)
+                    
+                    
+                    while key == ord('s'):
+
+                        key = cv2.waitKey(1)
+
+                        cv2.imwrite((os.path.join(op.folder, f'yolo_frame.png'), display_image))
 
 
                     if key == ord('q'):

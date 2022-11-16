@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='options.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\roptions.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x14is_msgs/camera.proto\"y\n\x15WeaponDetectorOptions\x12\x12\n\nbroker_uri\x18\x01 \x01(\t\x12\x12\n\nzipkin_uri\x18\x02 \x01(\t\x12\x19\n\x05model\x18\x03 \x01(\x0b\x32\n.YoloModel\x12\x1d\n\x07\x63\x61meras\x18\x04 \x03(\x0b\x32\x0c.CameraSetup\"\xff\x01\n\tYoloModel\x12\x1e\n\x16people_detection_model\x18\x01 \x01(\t\x12\x19\n\x11weapon_model_file\x18\x02 \x01(\t\x12\x17\n\x0fpeople_nms_conf\x18\x03 \x01(\x02\x12\x17\n\x0fweapon_nms_conf\x18\x04 \x01(\x02\x12\x1d\n\x15people_infer_img_size\x18\x05 \x01(\r\x12\x1d\n\x15weapon_infer_img_size\x18\x06 \x01(\r\x12\x1a\n\x12weapon_class_names\x18\x07 \x03(\t\x12\x0b\n\x03gpu\x18\x08 \x01(\r\x12\x1e\n\x16increase_image_percent\x18\t \x01(\r\"B\n\x0b\x43\x61meraSetup\x12\n\n\x02id\x18\x01 \x01(\x03\x12\'\n\x06\x63onfig\x18\x02 \x01(\x0b\x32\x17.is.vision.CameraConfigb\x06proto3')
+  serialized_pb=_b('\n\roptions.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x14is_msgs/camera.proto\"\x89\x01\n\x15WeaponDetectorOptions\x12\x12\n\nbroker_uri\x18\x01 \x01(\t\x12\x12\n\nzipkin_uri\x18\x02 \x01(\t\x12\x0e\n\x06\x66older\x18\x03 \x01(\t\x12\x19\n\x05model\x18\x04 \x01(\x0b\x32\n.YoloModel\x12\x1d\n\x07\x63\x61meras\x18\x05 \x03(\x0b\x32\x0c.CameraSetup\"\xff\x01\n\tYoloModel\x12\x1e\n\x16people_detection_model\x18\x01 \x01(\t\x12\x19\n\x11weapon_model_file\x18\x02 \x01(\t\x12\x17\n\x0fpeople_nms_conf\x18\x03 \x01(\x02\x12\x17\n\x0fweapon_nms_conf\x18\x04 \x01(\x02\x12\x1d\n\x15people_infer_img_size\x18\x05 \x01(\r\x12\x1d\n\x15weapon_infer_img_size\x18\x06 \x01(\r\x12\x1a\n\x12weapon_class_names\x18\x07 \x03(\t\x12\x0b\n\x03gpu\x18\x08 \x01(\r\x12\x1e\n\x16increase_image_percent\x18\t \x01(\r\"B\n\x0b\x43\x61meraSetup\x12\n\n\x02id\x18\x01 \x01(\x03\x12\'\n\x06\x63onfig\x18\x02 \x01(\x0b\x32\x17.is.vision.CameraConfigb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,is__msgs_dot_camera__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -51,15 +51,22 @@ _WEAPONDETECTOROPTIONS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='model', full_name='WeaponDetectorOptions.model', index=2,
-      number=3, type=11, cpp_type=10, label=1,
+      name='folder', full_name='WeaponDetectorOptions.folder', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='model', full_name='WeaponDetectorOptions.model', index=3,
+      number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='cameras', full_name='WeaponDetectorOptions.cameras', index=3,
-      number=4, type=11, cpp_type=10, label=3,
+      name='cameras', full_name='WeaponDetectorOptions.cameras', index=4,
+      number=5, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -76,8 +83,8 @@ _WEAPONDETECTOROPTIONS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=69,
-  serialized_end=190,
+  serialized_start=70,
+  serialized_end=207,
 )
 
 
@@ -163,8 +170,8 @@ _YOLOMODEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=448,
+  serialized_start=210,
+  serialized_end=465,
 )
 
 
@@ -201,8 +208,8 @@ _CAMERASETUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=450,
-  serialized_end=516,
+  serialized_start=467,
+  serialized_end=533,
 )
 
 _WEAPONDETECTOROPTIONS.fields_by_name['model'].message_type = _YOLOMODEL

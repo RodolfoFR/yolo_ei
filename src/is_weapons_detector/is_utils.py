@@ -244,10 +244,21 @@ def prepare_to_display(img, new_shape=(640, 640), color=114, title = None, borde
         cv2.rectangle(img_border,(shift,shift),(new_shape[0]-shift,new_shape[1]-shift), border_color, int(border) )
     return img_border, ratio, (dw, dh)
 
-# create a bounfing box in the frame, according yolo prediction
-# frame for display with cv2
-def bounding_box(frame, detections, class_names, infer_conf):
 
+def bounding_box(frame, detections, class_names, infer_conf):
+    """
+    Create a bounfing box in the frame, according yolo prediction
+    Using cv2
+
+    Args:
+        frame (numpy.ndarray): frame without bounding box
+        detections (numpy.ndarray): it's the yolo detection, (points of bounding box, confidence and class)
+        class_names (String): List of class names
+        infer_conf (float): minimum value of accuracy to create the bounding box
+
+    Returns:
+        frame(numpy.ndarray): frame with bounding box
+    """
     if len(detections) > 0:
         for xmin, ymin, xmax, ymax, conf, clf in detections:
 

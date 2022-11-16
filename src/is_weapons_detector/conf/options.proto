@@ -7,8 +7,9 @@ import "is_msgs/camera.proto";
 message WeaponDetectorOptions {
     string broker_uri = 1;
     string zipkin_uri = 2;
-    YoloModel model  = 3;
-    repeated CameraSetup cameras = 4;
+    string folder = 3;
+    YoloModel model  = 4;
+    repeated CameraSetup cameras = 5;
 
 }
 

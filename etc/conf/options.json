@@ -1,10 +1,11 @@
 {
     "broker_uri": "amqp://guest:guest@localhost:5672", 
     "zipkin_uri": "http://zipkin.default:9411",
+    "folder": "/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames",
     "model": {
             "people_detection_model": "yolov5m6",
             "weapon_model_file": "/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/yolov5s.pt",
-            "people_nms_conf": 0.5,
+            "people_nms_conf": 0.57,
             "weapon_nms_conf":0.4,
             "people_infer_img_size":1280,
             "weapon_infer_img_size":1280,
