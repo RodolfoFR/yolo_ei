@@ -13,7 +13,7 @@ from is_msgs.image_pb2 import Image
 from is_wire.core import Logger, Subscription, Message, Tracer
 
 from weapons_detector import WeaponsDetector
-from is_utils import load_options, create_exporter, get_topic_id,  to_image, to_np, annotate_image, bounding_box
+from is_utils import load_options, create_exporter, get_topic_id,  to_image, to_np, annotate_image, bounding_box, random_hex_id, save_video
 from stream_channel import StreamChannel
 
 
@@ -83,6 +83,11 @@ def main():
     display_rate = 4
     first = 0
     rod = False
+    
+    infos_print = 0
+
+    recording = False
+    video_name = random_hex_id() # video name, in hex number 6 character
     id_image_save = 0
 
     gpu_activated = cuda.is_available() 
@@ -96,8 +101,8 @@ def main():
     
     while gpu_activated:
    
-    # parametro return_dropped=True serve além de receber a messagem receber o dropped
-    # consume a mensagem  
+        # parametro return_dropped=True serve além de receber a messagem receber o dropped
+        # consume a mensagem  
         msg, dropped = channel.consume_last(return_dropped=True)
        
         # não sei o msg.extract_tracing(),
@@ -130,7 +135,14 @@ def main():
             detection_span = _span
 
             if len(images_data) == len(op.cameras):
-                
+
+                if infos_print == 0:
+                    print('\n==================================================================================\n')
+                    print('Press [q] for exit')
+                    print('Press [s] for save video')
+                    print('\n==================================================================================')
+                    infos_print = 1
+
                 for c in op.cameras:
                     n_sample += 1
                 
@@ -158,13 +170,11 @@ def main():
                     cv2.imshow('YOLO', display_image)
 
                     key = cv2.waitKey(1)
-                    
-                    
-                    while key == ord('s'):
 
-                        key = cv2.waitKey(1)
-
-                        cv2.imwrite((os.path.join(op.folder, f'yolo_frame.png'), display_image))
+                    # save images and store in the folder
+                    # Press 's' for start recording
+                    # Press other thing for stop recording
+                    id_image_save = save_video(op.folder, display_image, key, video_name, id_frame=id_image_save)
 
 
                     if key == ord('q'):

@@ -1,39 +1,23 @@
-import torch
-import yolov5
+#import torch
+#import yolov5
 import numpy as np
 import cv2
-from weapons_detector import WeaponsDetector
-from is_utils import load_options, annotate_image
+#from weapons_detector import WeaponsDetector
+from random import choice
 
 
-print('torch foi importado')
+def random_hex_id():
 
-print(torch.cuda.is_available())
+    hex_digit = 'FEDCBA9876543210'
+    hex_number= ''
+    for i in range(0, 6):
+        hex_number += choice(hex_digit)
+        
+    return hex_number
 
+v = random_hex_id()
 
-
-network = torch.hub.load('ultralytics/yolov5', "yolov5s",autoshape=True, pretrained=True, force_reload=True)
-
-
-img = cv2.imread('images/images_test/image_people_test.jpeg')
-
-img_np = np.asarray(img)
-print(img_np)
-
-
-result = network(img)
-
-print(result.pandas().xyxy[0])
-
-x1, y1, x2, y2, conf, classe, name = result
-
-print(x1)
-print(y1)
-print(x2)
-print(y2)
-print(conf)
-print(classe)
-print(name)
+print(v)
 
 
 

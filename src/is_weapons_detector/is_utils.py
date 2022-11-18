@@ -1,8 +1,10 @@
 import re
 import sys
 import cv2
+import os
 import numpy as np
-from datetime import datetime
+from datetime import date
+from random import choice
 # before was .conf.msgs_pb2 in from to import Image and ObjectAnnotation, original file
 from conf.msgs_pb2 import Image, ObjectAnnotations
 from google.protobuf.json_format import Parse
@@ -262,23 +264,89 @@ def bounding_box(frame, detections, class_names, infer_conf):
     if len(detections) > 0:
         for xmin, ymin, xmax, ymax, conf, clf in detections:
 
-            if conf > infer_conf:
+            if conf <= infer_conf: continue
+            
+            xmin = int(xmin)
+            ymin = int(ymin)
+            xmax = int(xmax)
+            ymax = int(ymax)
 
-                xmin = int(xmin)
-                ymin = int(ymin)
-                xmax = int(xmax)
-                ymax = int(ymax)
 
-
-                label = class_names[0] if clf == 0 else class_names[1]
-                color  = (0,150,0) if label == "pessoa" else (0,0,150) if label == "Arma" else (150,0,0)
-                min_point = (xmin, ymin)
-                max_point = (xmax, ymax)
+            label = class_names[0] if clf == 0 else class_names[1]
+            color  = (0,150,0) if label == "pessoa" else (0,0,150) if label == "Arma" else (150,0,0)
+            min_point = (xmin, ymin)
+            max_point = (xmax, ymax)
                 
-                frame = cv2.rectangle(frame, min_point, max_point, color, 2)
-                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+            frame = cv2.rectangle(frame, min_point, max_point, color, 2)
+            frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
 
     return frame
 
 
+def random_hex_id():
+
+    """
+    Create a random hex id 
+
+    Returns:
+        hex_number(String): hex number, 6 character,
+    """
+
+    hex_character = 'FEDCBA9876543210'
+    hex_number= ''
+    for i in range(0, 6):
+        hex_number += choice(hex_character)
+
+    return hex_number
+
+def save_video(path, frame, key, video_name, id_frame, recording, infos_print='',save_key='s', stop_key='p'):
+
+    """
+    Save frames in the folder
+
+    Args:
+        path(String): The path of the folder to save the frames
+        frame(numpy.ndarray): frame to be saved
+        key(?): key of cv2.waitKey(0)
+        video_name(String): The name of video to be saved, preferably hex number from random_hex_id funcion
+        id_frame(Int): index of the frame
+        save_key(String): Save key, default 's'
+
+    Returns:
+        id_frame(Int): next frame index
+
+    """
+
+    if (key == ord(save_key) or recording): 
+
+        recording = True
+
+        today = str(date.today())
+        
+        cv2.imwrite((os.path.join(path, f'{video_name}-{today}-yolo_frame.png{id_frame}'), frame))
+        
+        if infos_print == 1:
+            print('Recording!')
+            print('Press [p] for stop recording')
+
+        id_frame += 1
+
+    elif key == ord(stop_key) and recording:
+
+        recording = False
+    
+    return id_frame, recording
+    
+
+    
+
+
+    """
+    description of funcion
+
+    Args:
+        Arg(type): description
+    Returns:
+        return(type): description
+    """
 
