@@ -67,7 +67,7 @@
 #         return detections
 import os
 import cv2
-import yolov5
+#import yolov5
 import torch
 import numpy as np
 # before was .is_utils in from to import crop_image, increase_bbox, original file

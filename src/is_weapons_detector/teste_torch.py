@@ -2,22 +2,49 @@
 #import yolov5
 import numpy as np
 import cv2
+from is_wire.core import Channel,Subscription,Message
+from is_msgs.image_pb2 import Image
+from is_utils import load_options, bounding_box
 #from weapons_detector import WeaponsDetector
-from random import choice
 
 
-def random_hex_id():
+def to_np(input_image):
+    if isinstance(input_image, np.ndarray):
+        output_image = input_image
+    elif isinstance(input_image, Image):
+        buffer = np.frombuffer(input_image.data, dtype=np.uint8)
+        output_image = cv2.imdecode(buffer, flags=cv2.IMREAD_COLOR)
+    else:
+        output_image = np.array([], dtype=np.uint8)
+    return output_image
 
-    hex_digit = 'FEDCBA9876543210'
-    hex_number= ''
-    for i in range(0, 6):
-        hex_number += choice(hex_digit)
+
+broker_uri = "amqp://guest:guest@localhost:5672"
+camera_id = 3 # selecionar camera
+channel = Channel(broker_uri)
+subscription = Subscription(channel=channel)
+subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
+#op = load_options()
+#detector = WeaponsDetector(op.model)
+
+
+while True:
+
+    msg = channel.consume()  
+    im = msg.unpack(Image)
+    frame = to_np(im)
+
+    #detection = detector.detect_people(frame, frame.shape[1])
+    #frame = bounding_box(frame, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+    
+
+    cv2.imshow('test', frame)
+    key = cv2.waitKey(1)
         
-    return hex_number
-
-v = random_hex_id()
-
-print(v)
+    if key == ord('q'):
+        break
+    elif key == ord('d'):
+        print('enabled')
 
 
 

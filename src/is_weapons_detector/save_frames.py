@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import time
 from torch import cuda
+from datetime import date
 
 import dateutil.parser as dp
 
@@ -31,6 +32,56 @@ def place_images(output_image, images):
     output_image[0:h, w:2 * w, :] = images[1]
     output_image[h:2 * h, 0:w, :] = images[2]
     output_image[h:2 * h, w:2 * w, :] = images[3]
+
+def save_video(path, frame, key, video_name, id_frame, recording=False, save_key='s', stop_key='p'):
+
+    """
+    Save frames in the folder, if key = save_key and key = stop_key stop the recording
+
+    Args:
+        path(String): The path of the folder to save the frames
+        frame(numpy.ndarray): frame to be saved
+        key(?): key of cv2.waitKey(0)
+        video_name(String): The name of video to be saved, preferably hex number from random_hex_id funcion
+        id_frame(Int): index of the frame
+        recording(Bool): check that it is recording or not
+        save_key(String): Save key, default 's'
+        stop_key(String): Stopping key, default 'p'
+
+    Returns:
+        id_frame(Int): next frame index
+        recording(Bool): check that it is recording or not
+
+    """
+
+    if (key == save_key or recording): 
+
+        if not recording:
+            print('\n==================================================================================\n')
+            print('Recording Now')
+            print('Press [p] for stop')
+            print('\n==================================================================================\n')
+            recording = True
+
+
+        today = str(date.today())
+        
+        cv2.imwrite((os.path.join(path, f'{video_name}-{today}-yolo_frame.png{id_frame}'), frame))
+        
+
+        id_frame += 1
+
+    elif key == stop_key and recording:
+
+        if recording:
+            print('\n==================================================================================\n')
+            print('Stopping recording')
+            print('\n==================================================================================\n')
+            recording = False
+
+       
+    
+    return id_frame, recording
 
 
    
@@ -88,20 +139,19 @@ def main():
 
     recording = False
     video_name = random_hex_id() # video name, in hex number 6 character
-    id_image_save = 100
+    id_image_save = 0
 
-    detector_activated = True 
+    detector_activated = True
 
-    gpu_activated = cuda.is_available() # check if GPU is avaiable (bool)
+    gpu_activated = cuda.is_available() 
 
-    # log info of GPu situation
     if not gpu_activated:
         log.info('GPU is not enabled')
     else:
         log.info('GPU is enabled')
 
 
-    # only runs when GPU is on     
+    
     while gpu_activated:
    
         # parametro return_dropped=True serve além de receber a messagem receber o dropped
@@ -139,17 +189,6 @@ def main():
 
             if len(images_data) == len(op.cameras):
 
-                
-
-                """if infos_print == 0:
-                    print('\n==================================================================================\n')
-                    print('Press [q] for exit')
-                    print('Press [s] for save video')
-                    print('Press [p] for stop video')
-                    print('Press [d] for deactivate')
-                    print('Press [a] for activate the detector')
-                    print('\n==================================================================================')
-                    infos_print = 1"""
 
                 for c in op.cameras:
                     n_sample += 1
@@ -159,56 +198,23 @@ def main():
                     images = [0, 0, 0, 0]
 
                     for _, d in images_data.items():
-                        i = int(_) # id of the camera
-                        images[i] = cv2.imdecode(d, cv2.IMREAD_COLOR) # image numpy format
-                    
-
+                        i = int(_)
+                        images[i] = cv2.imdecode(d, cv2.IMREAD_COLOR)
+                   
                     place_images(full_image, images) # reajusta o full_image para receber as imagens
-                    display_image = cv2.resize(full_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image 
+                    display_image = cv2.resize(full_image, (0, 0), fx=0.5, fy=0.5)
 
                     infer_size = display_image.shape[1]
-                    infer_size = int(infer_size / 2) # minimum size for prediction
-                    
-                    if detector_activated:
+                    infer_size = int(infer_size / 2)
 
-                        detection = detector.detect_people(display_image, infer_size) # prediction
+                    detection = detector.detect_people(display_image, infer_size)
+                    display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
 
-                        # draw bounding box in the frame
-                        display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
-                    
-            
-                    cv2.imshow('YOLO', display_image) # display images
+                    cv2.imshow('YOLO', display_image)
                     key = cv2.waitKey(1)
-                    
 
-                    if key == 'q':
-                        break
+                    id_image_save, recording = save_video(op.folder, display_image, key, video_name, id_frame=id_image_save, recording=recording)
 
-                    
-
-                        
-        #with tracer.span(name='image_and_annotation_publish'):
-            # é a anotação da imagem classifica, de aonde está o objeto classificad, a precisão e a classe dele
-                #image = annotate_image(im_np,weapons, detector.class_names)
-             # publica a anotação da imagem
-                #ann_image_msg = Message()
-        #     ann_image_msg.topic = 'WeaponsDetector.{}.Frame'.format(camera_id)
-        #     #ann_image_msg.pack(image)
-        #     channel.publish(ann_image_msg)
-            
-
-        # span.add_attribute('Detections', len(weapons))
-        # tracer.end_span()
-
-        # info = {
-        #     'detections': weapons,
-        #     'dropped_messages': dropped,
-        #     'took_ms': {
-        #         'detection': round(span_duration_ms(detection_span), 2),
-        #         'service': round(span_duration_ms(span), 2)
-        #     }
-        # }
-        # log.info('{}', str(info).replace("'", '"'))
 
 
 if __name__ == "__main__":
