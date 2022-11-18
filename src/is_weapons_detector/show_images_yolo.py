@@ -90,6 +90,8 @@ def main():
     video_name = random_hex_id() # video name, in hex number 6 character
     id_image_save = 0
 
+    detector_activated = True
+
     gpu_activated = cuda.is_available() 
 
     if not gpu_activated:
@@ -140,6 +142,9 @@ def main():
                     print('\n==================================================================================\n')
                     print('Press [q] for exit')
                     print('Press [s] for save video')
+                    print('Press [p] for stop video')
+                    print('Press [d] for deactivate')
+                    print('Press [a] for activate the detector')
                     print('\n==================================================================================')
                     infos_print = 1
 
@@ -160,26 +165,55 @@ def main():
                     infer_size = display_image.shape[1]
                     infer_size = int(infer_size / 2)
                     
+                    if detector_activated:
+
+                        detection = detector.detect_people(display_image, infer_size)
+
+                        display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
                     
-
-                    detection = detector.detect_people(display_image, infer_size)
-
-                    display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
-
             
                     cv2.imshow('YOLO', display_image)
 
                     key = cv2.waitKey(1)
 
+
+
                     # save images and store in the folder
                     # Press 's' for start recording
-                    # Press other thing for stop recording
-                    id_image_save = save_video(op.folder, display_image, key, video_name, id_frame=id_image_save)
+                    # Press 'p' for stop recording
+                    id_image_save, recording = save_video(op.folder, display_image, key, video_name, id_frame=id_image_save, recording=recording)
+                    
 
 
                     if key == ord('q'):
                         break
 
+                    elif key == ord('d'):
+
+                        if infos_print == 1 or infos_print == 3:
+                            print('\n==================================================================================\n')
+                            print('Detection Disabled')
+                            print('Press [a] for activate')
+                            print('\n==================================================================================\n')
+                            infos_print = 2
+
+                        key = ''
+                        detector_activated = False
+
+                    elif key == ord('a'):
+                        if infos_print == 1 or infos_print == 2:
+                            print('\n==================================================================================\n')
+                            print('Detection Enabled')
+                            print('Press [d] for deactivate')
+                            print('\n==================================================================================\n')
+                            infos_print = 3
+                        key = ''
+                        detector_activated = True
+
+                    if infos_print != 1:
+                        infos_print = 0
+
+                        
         #with tracer.span(name='image_and_annotation_publish'):
             # é a anotação da imagem classifica, de aonde está o objeto classificad, a precisão e a classe dele
                 #image = annotate_image(im_np,weapons, detector.class_names)

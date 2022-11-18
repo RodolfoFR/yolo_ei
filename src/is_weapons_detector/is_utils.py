@@ -299,10 +299,10 @@ def random_hex_id():
 
     return hex_number
 
-def save_video(path, frame, key, video_name, id_frame, recording, infos_print='',save_key='s', stop_key='p'):
+def save_video(path, frame, key, video_name, id_frame, recording=False, save_key='s', stop_key='p'):
 
     """
-    Save frames in the folder
+    Save frames in the folder, if key = save_key and key = stop_key stop the recording
 
     Args:
         path(String): The path of the folder to save the frames
@@ -310,30 +310,42 @@ def save_video(path, frame, key, video_name, id_frame, recording, infos_print=''
         key(?): key of cv2.waitKey(0)
         video_name(String): The name of video to be saved, preferably hex number from random_hex_id funcion
         id_frame(Int): index of the frame
+        recording(Bool): check that it is recording or not
         save_key(String): Save key, default 's'
+        stop_key(String): Stopping key, default 'p'
 
     Returns:
         id_frame(Int): next frame index
+        recording(Bool): check that it is recording or not
 
     """
 
     if (key == ord(save_key) or recording): 
 
-        recording = True
+        if not recording:
+            print('\n==================================================================================\n')
+            print('Recording Now')
+            print('Press [p] for stop')
+            print('\n==================================================================================\n')
+            recording = True
+
 
         today = str(date.today())
         
         cv2.imwrite((os.path.join(path, f'{video_name}-{today}-yolo_frame.png{id_frame}'), frame))
         
-        if infos_print == 1:
-            print('Recording!')
-            print('Press [p] for stop recording')
 
         id_frame += 1
 
     elif key == ord(stop_key) and recording:
 
-        recording = False
+        if recording:
+            print('\n==================================================================================\n')
+            print('Stopping recording')
+            print('\n==================================================================================\n')
+            recording = False
+
+       
     
     return id_frame, recording
     
