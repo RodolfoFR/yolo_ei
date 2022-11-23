@@ -158,8 +158,8 @@ def main():
 
                     images = [0, 0, 0, 0]
 
-                    for _, d in images_data.items():
-                        i = int(_) # id of the camera
+                    for i, d in images_data.items():
+                        i = int(i) # id of the camera
                         images[i] = cv2.imdecode(d, cv2.IMREAD_COLOR) # image numpy format
                     
 
