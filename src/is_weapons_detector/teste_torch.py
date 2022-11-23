@@ -5,7 +5,7 @@ import cv2
 from is_wire.core import Channel,Subscription,Message
 from is_msgs.image_pb2 import Image
 from is_utils import load_options, bounding_box
-#from weapons_detector import WeaponsDetector
+from weapons_detector import WeaponsDetector
 
 
 def to_np(input_image):
@@ -20,12 +20,12 @@ def to_np(input_image):
 
 
 broker_uri = "amqp://guest:guest@localhost:5672"
-camera_id = 3 # selecionar camera
+camera_id = 0 # selecionar camera
 channel = Channel(broker_uri)
 subscription = Subscription(channel=channel)
 subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
-#op = load_options()
-#detector = WeaponsDetector(op.model)
+op = load_options()
+detector = WeaponsDetector(op.model)
 
 
 while True:
@@ -34,8 +34,8 @@ while True:
     im = msg.unpack(Image)
     frame = to_np(im)
 
-    #detection = detector.detect_people(frame, frame.shape[1])
-    #frame = bounding_box(frame, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+    detection = detector.detect_people(frame)
+    frame = bounding_box(frame, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
     
 
     cv2.imshow('test', frame)

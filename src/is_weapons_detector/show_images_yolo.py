@@ -78,6 +78,7 @@ def main():
     full_image = np.zeros(size, dtype=np.uint8)
 
 
+
     images_data = {}
     n_sample = 0
     display_rate = 4
@@ -85,6 +86,8 @@ def main():
     rod = False
     
     infos_print = 0
+
+  
 
     recording = False
     video_name = random_hex_id() # video name, in hex number 6 character
@@ -171,11 +174,15 @@ def main():
                     
                     if detector_activated:
 
+
                         detection = detector.detect_people(display_image, infer_size) # prediction
 
                         # draw bounding box in the frame
                         display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
-                    
+                            
+                             
+                     
+
             
                     cv2.imshow('YOLO', display_image) # display images
                     key = cv2.waitKey(1)
