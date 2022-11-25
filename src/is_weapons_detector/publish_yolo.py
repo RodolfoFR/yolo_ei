@@ -10,7 +10,7 @@ from is_wire.rpc import ServiceProvider, LogInterceptor
 from conf.msgs_pb2 import Image
 
 from weapons_detector import WeaponsDetector
-from is_utils import load_options, to_np, get_topic_id, bounding_box 
+from is_utils import load_options, to_image, to_np, get_topic_id, bounding_box 
 
 
 def place_images(output_image, images):
@@ -45,7 +45,8 @@ size = (2 * op.cameras[0].config.image.resolution.height,
         2 * op.cameras[0].config.image.resolution.width, 
         3)
 
-service_puslish = Subscription(channel=channel)
+puslish_name = 'Images.YOLOv5'
+subscription_yolo = Subscription(channel=channel, name=puslish_name)
 
 full_image = np.zeros(size, dtype=np.uint8)
 
@@ -60,7 +61,12 @@ else:
 # variebles
 images_data = {}
 n_sample = 0
+for c in op.cameras:
+    n_sample += 1
 display_rate = 2
+rod = False
+
+
 
 
 while gpu_activated:
@@ -78,8 +84,6 @@ while gpu_activated:
 
     if len(images_data) == len(op.cameras):
 
-        for c in op.cameras:
-            n_sample += 1
                 
         if n_sample % display_rate == 0:
 
@@ -97,7 +101,25 @@ while gpu_activated:
             infer_size = int(infer_size / 2) # minimum size for prediction
 
             detection = detector.detect_people(input_image_yolo, infer_size) # prediction
+            
+
+            # draw bounding box in the frame
             output_image_yolo = input_image_yolo
             output_image_yolo = bounding_box(output_image_yolo, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+
+            output_image = to_image(output_image_yolo) # image for publish (Image)
+
+            msg2publish = Message(content=output_image, reply_to=subscription_yolo)  # Message for publish (Message)
+
+            channel.publish(msg2publish, topic='YoloPrediction.Frame') # Publish the frame with the yolo prediction and bounding box
+
+            
+
+            
+
+            
+
+
+
 
             

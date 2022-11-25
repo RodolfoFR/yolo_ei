@@ -3,7 +3,6 @@ import sys
 import cv2
 import os
 import numpy as np
-from datetime import date
 from random import choice
 # before was .conf.msgs_pb2 in from to import Image and ObjectAnnotation, original file
 from conf.msgs_pb2 import Image, ObjectAnnotations
@@ -320,7 +319,16 @@ def save_video(path, frame, key, video_name, id_frame, recording=False, save_key
 
     """
 
-    if (key == ord(save_key) or recording): 
+    if key == ord(stop_key) and recording:
+
+        if recording:
+            print('\n==================================================================================\n')
+            print('Stopping recording')
+            print('\n==================================================================================\n')
+            recording = False
+
+    
+    elif (key == ord(save_key) or recording): 
 
         if not recording:
             print('\n==================================================================================\n')
@@ -330,23 +338,13 @@ def save_video(path, frame, key, video_name, id_frame, recording=False, save_key
             recording = True
 
 
-        today = str(date.today())
         
-        cv2.imwrite((os.path.join(path, f'{video_name}-{today}-yolo_frame.png{id_frame}'), frame))
+        cv2.imwrite(f'{path}/YoloFrame{video_name}_{id_frame}.png', frame)
         
 
         id_frame += 1
-
-    elif key == ord(stop_key) and recording:
-
-        if recording:
-            print('\n==================================================================================\n')
-            print('Stopping recording')
-            print('\n==================================================================================\n')
-            recording = False
-
-       
     
+
     return id_frame, recording
     
 
