@@ -20,9 +20,9 @@ from stream_channel import StreamChannel
 
 
 
-def span_duration_ms(span):
+"""def span_duration_ms(span):
     dt = dp.parse(span.end_time) - dp.parse(span.start_time)
-    return dt.total_seconds() * 1000.0
+    return dt.total_seconds() * 1000.0"""
 
 # congifurar os tamanhos tas imagens, para plotar elas juntas
 def place_images(output_image, images):
@@ -68,11 +68,14 @@ subscription = Subscription(channel=channel, name=service_name)
 for c in op.cameras:
     subscription.subscribe('CameraGateway.{}.Frame'.format(c.id))
 
-    
+# get the size of the images from the camera 
 size = (2 * op.cameras[0].config.image.resolution.height,
         2 * op.cameras[0].config.image.resolution.width, 
         3)
-    
+
+# variables 
+
+# empty array, but in the proper format
 full_image = np.zeros(size, dtype=np.uint8)
 
 
@@ -85,13 +88,15 @@ display_rate = 2
 
 first = 0
 rod = False
-    
+
+# to determine fps    
 start_time = 0
 end_time = 1
 
+# If true recording the frames (bool)
+recording = False
 
-recording = True
-
+# If True activate the detector (bool)
 detector_activated = True
 
 gpu_activated = torch.cuda.is_available() # check if GPU is avaiable (bool)
@@ -124,39 +129,21 @@ while gpu_activated:
     im_np = np.fromstring(im.data, dtype=np.uint8)
             
 
-
-#with tracer.span(name='detection') as _span:
-
     # pega o topic da mensagem e dividi ela
     # retorna so o numero do id (0, 1, 2, 3), se estiver correta a formatacao
     camera_id = get_topic_id(msg.topic)
 
     # amazena as imagens(formato np) em suas posicoes
     images_data[camera_id] = im_np
-    # classificar a imagem (formato numpy)
+    
 
             
             
-    #weapons = detector.detect(im_np) # retorna a coordenada da pessoa com arama, ou a propria arma,
-            
-            #detection_span = _span
+        
+    # check if there are the same amount of images and cameras
+    if len(images_data) == len(op.cameras): 
 
-    if len(images_data) == len(op.cameras):
-
-                
-
-        """if infos_print == 0:
-                print('\n==================================================================================\n')
-                print('Press [q] for exit')
-                print('Press [s] for save video')
-                print('Press [p] for stop video')
-                print('Press [d] for deactivate')
-                print('Press [a] for activate the detector')
-                print('\n==================================================================================')
-                infos_print = 1"""
-
-       
-                
+                   
         if n_sample % display_rate == 0:
 
             images = [0, 0, 0, 0]
@@ -166,25 +153,26 @@ while gpu_activated:
                 images[i] = cv2.imdecode(d, cv2.IMREAD_COLOR) # image numpy format
                     
 
-            place_images(full_image, images) # reajusta o full_image para receber as imagens
+            place_images(full_image, images) # adjusts the full_image to receive the images
             display_image = cv2.resize(full_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image 
 
-            infer_size = display_image.shape[1]
-            infer_size = int(infer_size / 2) # minimum size for prediction
+            max_size = display_image.shape[1]
+            max_size = int(max_size / 2) # minimum size for prediction
 
-            end_time = time.time()
+            end_time = time.time() # end 
 
-            fps = int( 1 / (end_time - start_time) )
+            fps = int( 1 / (end_time - start_time) ) # fps of video 
 
-            
+            # write the fps in the frames
             display_image = cv2.putText(display_image, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
 
             if detector_activated:
 
-                detection_weapons = detector.detect_weapons(display_image, infer_size) # prediction weapons
+                detection_weapons = detector.detect_weapons(display_image, max_size) # prediction weapons
+                # draw bounding box in the frame
                 display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
 
-                detection_people = detector.detect_people(display_image, infer_size, recording) # prediction people
+                detection_people = detector.detect_people(display_image, max_size, recording) # prediction people
 
                 if not recording:
                     # draw bounding box in the frame

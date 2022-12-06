@@ -9,7 +9,7 @@
             "weapon_nms_conf":0.05,
             "people_infer_img_size":1280,
             "weapon_infer_img_size":1280,
-            "weapon_class_names": ["Arma"],
+            "weapon_class_names": ["weapon"],
             "gpu":0,
             "increase_image_percent":20
     },

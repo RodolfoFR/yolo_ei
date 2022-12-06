@@ -21,25 +21,31 @@ def to_np(input_image):
     return output_image
 
 
-
+# variables
 
 broker_uri = "amqp://guest:guest@localhost:5672"
-camera_id = 2 # selecionar camera
+camera_id = 2 # select camera
 channel = Channel(broker_uri)
 subscription = Subscription(channel=channel)
 subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
 
+# for puslish prediction images
 puslish_name = 'Images.YOLOv5'
 subscription_yolo = Subscription(channel=channel, name=puslish_name)
 
-op = load_options()
-detector = WeaponsDetector(op.model)
 
+op = load_options() # infos as broker uri, zipkin uri, paremeters of model and cameras
+
+detector = WeaponsDetector(op.model) 
+
+# to determine fps  
 start_time = 0
 end_time = 1
 
+# If true recording the frames (bool)
 recording = True
 
+# If True activate the detector (bool)
 detector_activated = True
 
 
@@ -55,29 +61,32 @@ else:
 
 
 
+# only runs when GPU is on 
 while gpu_activated:
 
-    msg = channel.consume()  
-    im = msg.unpack(Image)
-    frame = to_np(im)
+    msg = channel.consume() # consume message from channel 
+    im = msg.unpack(Image) # unpack Image format (Image)
+    frame = to_np(im) # Image for numpay (np.ndarray)
 
     
-    infer_size = frame.shape[1]
+    max_size = frame.shape[1] # max size of prediction
 
     end_time = time.time()
 
-    fps = int( 1 / (end_time - start_time) )
 
-            
+    fps = int( 1 / (end_time - start_time) ) # fps of video
+
+     # write the fps in the frames
     display_image = cv2.putText(frame, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
 
     
     if detector_activated:
 
-        detection_weapons = detector.detect_weapons(frame, infer_size) # prediction weapons
+        detection_weapons = detector.detect_weapons(frame, max_size) # prediction weapons
+        # draw bounding box in the frame
         frame = bounding_box(frame, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
 
-        detection_people = detector.detect_people(frame, infer_size, recording) # prediction people
+        detection_people = detector.detect_people(frame, max_size, recording) # prediction people
 
         if not recording:
             # draw bounding box in the frame
@@ -87,7 +96,9 @@ while gpu_activated:
     cv2.imshow('YOLO', frame) # display images
     key = cv2.waitKey(1)
 
-    start_time = time.time()    
+    start_time = time.time()
+
+   
 
 
 

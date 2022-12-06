@@ -263,6 +263,8 @@ def bounding_box(frame, detections, class_names, infer_conf):
     if len(detections) > 0:
         for xmin, ymin, xmax, ymax, conf, clf in detections:
 
+            thickness=5
+
             if conf <= infer_conf: continue
             
             xmin = int(xmin)
@@ -273,24 +275,27 @@ def bounding_box(frame, detections, class_names, infer_conf):
 
             label = class_names[int(clf)]
 
-            if label == "Pessoa":
-                color  = (0,150,0)
-            elif label == "Arma":
-                color  = (150,0,0)
-            elif label == "Pessoa Armada":
-                color = (0, 0, 150)
-
+            if label == "person":
+                color  = (0,0,144)
+            elif label == "weapon":
+                color  = (206,0,0)
+            
             
             min_point = (xmin, ymin)
             max_point = (xmax, ymax)
 
                
-            frame = cv2.rectangle(frame, min_point, max_point, color, 2)
+            frame = cv2.rectangle(frame, min_point, max_point, color, thickness)
 
-            if label == 'Pessoa' or label == 'Pessoa Armada':
-                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
-            elif label == 'Arma':
-                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+            text = f'{label}: {conf:.2f}'
+
+            text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, thickness)
+
+            frame = cv2.rectangle(frame, (xmin, ymin-15-text_size[1]), (xmin+text_size[0], ymin), color, cv2.FILLED)
+
+            frame = cv2.putText(frame, text, (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=thickness, lineType=cv2.LINE_AA)
+
+
                 
 
     return frame
@@ -364,13 +369,6 @@ def save_video(path, frame, key, video_name, id_frame, recording=False, save_key
 
     
 
-
-    """
-    description of funcion
-
-    Args:
-        Arg(type): description
-    Returns:
-        return(type): description
-    """
+  
+ 
 

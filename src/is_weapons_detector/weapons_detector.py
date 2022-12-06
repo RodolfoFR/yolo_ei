@@ -64,12 +64,23 @@ class WeaponsDetector:
       # Recebe model_conf.weapon_class_names (argurmento da classe), classe de WeaponsDetector em string
       # list(model_conf.weapon_class_names) tem ["Arma", "Pessoa Armada"], mas weapons_detector.classes são armas de fogo e facas ????
       # WeaponsDetector.class_names
-        self.class_names = ["Pessoa"] + list(model_conf.weapon_class_names)
+        self.class_names = ["person"] + list(model_conf.weapon_class_names)
  
 
-    def detect_weapons(self, image, infer_size, save=False):
+    def detect_weapons(self, image, max_size, save=False):
 
-        weapons = self.weapons_detector(image, infer_size)
+        """
+        Detect weapons in the image
+
+        Args:
+            image (numpy.ndarray): frame to detect
+            max_size (int): frame maximum size to detect
+            save (bool): True to save frame with bounding box
+        Returns:
+            weapons(numpy.ndarray): result of prediction, index 0 to 3 are points of bounding box, index 4 confidence, index 5 index class
+        """
+
+        weapons = self.weapons_detector(image, max_size)
         if save:
             weapons.save(save_dir='/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames')
         weapons = np.array(weapons.xyxy[0].cpu().numpy())
@@ -84,9 +95,20 @@ class WeaponsDetector:
     
 
     
-    def detect_people(self, image, infer_size, save=False):
+    def detect_people(self, image, max_size, save=False):
 
-        people = self.people_detector(image, infer_size)
+        """
+        Detect people in the image
+
+        Args:
+            image (numpy.ndarray): frame to detect
+            max_size (int): frame maximum size to detect
+            save (bool): True to save frame with bounding box
+        Returns:
+            weapons(numpy.ndarray): result of prediction, index 0 to 3 are points of bounding box, index 4 confidence, index 5 index class
+        """
+
+        people = self.people_detector(image, max_size)
         if save:
             people.save(save_dir='/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames')
         people = np.array(people.xyxy[0].cpu().numpy()) #.astype(int)
