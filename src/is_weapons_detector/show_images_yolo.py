@@ -41,7 +41,7 @@ log = Logger(name=service_name)
 # load_options(), uma funcao,  vem de is_utils.py
 # vai fazer um log.info do que vai ter dentro de op
 # basicamente op vai ser da classe WeaponDetectorOptions que vem de conf/options.proto
-# nessa classe: str .broker_uri = ip da camera (ou espaço), str .zipkin_uri = ip do zipkin_uri, YoloModel .model = parametro do modelo
+# nessa classe: str .broker_uri = ip da camera (ou espaco), str .zipkin_uri = ip do zipkin_uri, YoloModel .model = parametro do modelo
 op = load_options()
    
 # detector vai ser da classe WeaponsDetector que vem de weapons_detector.py, Rede para classificar
@@ -49,16 +49,16 @@ op = load_options()
 detector = WeaponsDetector(op.model)
 
 
-# StreamChannel é uma classe que vem de stream_channel.py
-# é parecido com Channel do is_wire.core
-# Mas ele é um canal, consume mensagem, se ele esperar demais, ele para, ou quando para a conexão
+# StreamChannel eh uma classe que vem de stream_channel.py
+# eh parecido com Channel do is_wire.core
+# Mas ele eh um canal, consume mensagem, se ele esperar demais, ele para, ou quando para a conexao
 channel = Channel(op.broker_uri)
    
 # log.info do ip das cameras que ele ta conetado
 log.info('Connected to broker {}', op.broker_uri)
 
-# create_exporter, é uma função de ia_utils.py, parametros: o nome do logger (rpc server) e ip do zipkin
-# exporter é alguma coisa que envolver o zipkin
+# create_exporter, eh uma funcao de ia_utils.py, parametros: o nome do logger (rpc server) e ip do zipkin
+# exporter eh alguma coisa que envolver o zipkin
 #exporter = create_exporter(service_name=service_name, uri=op.zipkin_uri)
    
 # Subscription para o cannal, e logger service_name
@@ -82,20 +82,20 @@ n_sample = 0
 for c in op.cameras:
     n_sample += 1
 display_rate = 2
+
 first = 0
 rod = False
     
-infos_print = 0
+start_time = 0
+end_time = 1
 
-  
 
-recording = False
-video_name = random_hex_id() # video name, in hex number 6 character
-id_image_save = 100
+recording = True
 
 detector_activated = True
 
 gpu_activated = torch.cuda.is_available() # check if GPU is avaiable (bool)
+
 
 # log info of GPu situation
 if not gpu_activated:
@@ -107,11 +107,11 @@ else:
 # only runs when GPU is on     
 while gpu_activated:
    
-    # parametro return_dropped=True serve além de receber a messagem receber o dropped
+    # parametro return_dropped=True serve alem de receber a messagem receber o dropped
     # consume a mensagem  
     msg = channel.consume()
        
-    # não sei o msg.extract_tracing(),
+    # nao sei o msg.extract_tracing(),
     #tracer = Tracer(exporter, span_context=msg.extract_tracing())
     #span = tracer.start_span(name='detection_and_render')
     #detection_span = None
@@ -128,10 +128,10 @@ while gpu_activated:
 #with tracer.span(name='detection') as _span:
 
     # pega o topic da mensagem e dividi ela
-    # retorna só o numero do id (0, 1, 2, 3), se estiver correta a formatação
+    # retorna so o numero do id (0, 1, 2, 3), se estiver correta a formatacao
     camera_id = get_topic_id(msg.topic)
 
-    # amazena as imagens(formato np) em suas posições
+    # amazena as imagens(formato np) em suas posicoes
     images_data[camera_id] = im_np
     # classificar a imagem (formato numpy)
 
@@ -171,18 +171,31 @@ while gpu_activated:
 
             infer_size = display_image.shape[1]
             infer_size = int(infer_size / 2) # minimum size for prediction
-                    
+
+            end_time = time.time()
+
+            fps = int( 1 / (end_time - start_time) )
+
+            
+            display_image = cv2.putText(display_image, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
+
             if detector_activated:
 
-                detection = detector.detect_people(display_image, infer_size) # prediction
+                detection_weapons = detector.detect_weapons(display_image, infer_size) # prediction weapons
+                display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
 
-                # draw bounding box in the frame
-                display_image = bounding_box(display_image, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+                detection_people = detector.detect_people(display_image, infer_size, recording) # prediction people
+
+                if not recording:
+                    # draw bounding box in the frame
+                    display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
                         
                             
                                        
             cv2.imshow('YOLO', display_image) # display images
             key = cv2.waitKey(1)
+
+            start_time = time.time()
                     
 
             if key == 'q':

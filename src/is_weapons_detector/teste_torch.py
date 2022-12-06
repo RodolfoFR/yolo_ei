@@ -1,11 +1,13 @@
-#import torch
+import torch
 #import yolov5
 import numpy as np
 import cv2
-from is_wire.core import Channel,Subscription,Message
+import time
+from is_wire.core import Channel,Subscription, Message
 from is_msgs.image_pb2 import Image
-from is_utils import load_options, bounding_box
+from is_utils import load_options, bounding_box, to_image
 from weapons_detector import WeaponsDetector
+#from simple_class import Simple
 
 
 def to_np(input_image):
@@ -19,32 +21,80 @@ def to_np(input_image):
     return output_image
 
 
+
+
 broker_uri = "amqp://guest:guest@localhost:5672"
-camera_id = 0 # selecionar camera
+camera_id = 2 # selecionar camera
 channel = Channel(broker_uri)
 subscription = Subscription(channel=channel)
 subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
+
+puslish_name = 'Images.YOLOv5'
+subscription_yolo = Subscription(channel=channel, name=puslish_name)
+
 op = load_options()
 detector = WeaponsDetector(op.model)
 
+start_time = 0
+end_time = 1
 
-while True:
+recording = True
+
+detector_activated = True
+
+
+gpu_activated = torch.cuda.is_available() # check if GPU is avaiable (bool)
+
+# log info of GPu situation
+if not gpu_activated:
+    print('GPU is not enabled')
+    device = 'cpu'
+else:
+    print('GPU is enabled')
+    device = 'cuda:0'
+
+
+
+while gpu_activated:
 
     msg = channel.consume()  
     im = msg.unpack(Image)
     frame = to_np(im)
 
-    detection = detector.detect_people(frame)
-    frame = bounding_box(frame, detections=detection, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
     
+    infer_size = frame.shape[1]
 
-    cv2.imshow('test', frame)
+    end_time = time.time()
+
+    fps = int( 1 / (end_time - start_time) )
+
+            
+    display_image = cv2.putText(frame, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
+
+    
+    if detector_activated:
+
+        detection_weapons = detector.detect_weapons(frame, infer_size) # prediction weapons
+        frame = bounding_box(frame, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
+
+        detection_people = detector.detect_people(frame, infer_size, recording) # prediction people
+
+        if not recording:
+            # draw bounding box in the frame
+            display_image = bounding_box(frame, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+
+
+    cv2.imshow('YOLO', frame) # display images
     key = cv2.waitKey(1)
-        
-    if key == ord('q'):
-        break
-    elif key == ord('d'):
-        print('enabled')
+
+    start_time = time.time()    
+
+
+
+    #msg2publish = Message(content=frame, reply_to=subscription_yolo)
+
+    #channel.publish(msg2publish, topic='YoloPrediction.Frame') # Publish the frame with the yolo prediction and bounding box
+    
 
 
 

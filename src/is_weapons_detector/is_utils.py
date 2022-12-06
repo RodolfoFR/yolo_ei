@@ -271,13 +271,27 @@ def bounding_box(frame, detections, class_names, infer_conf):
             ymax = int(ymax)
 
 
-            label = class_names[0] if clf == 0 else class_names[1]
-            color  = (0,150,0) if label == "pessoa" else (0,0,150) if label == "Arma" else (150,0,0)
+            label = class_names[int(clf)]
+
+            if label == "Pessoa":
+                color  = (0,150,0)
+            elif label == "Arma":
+                color  = (150,0,0)
+            elif label == "Pessoa Armada":
+                color = (0, 0, 150)
+
+            
             min_point = (xmin, ymin)
             max_point = (xmax, ymax)
-                
+
+               
             frame = cv2.rectangle(frame, min_point, max_point, color, 2)
-            frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+
+            if label == 'Pessoa' or label == 'Pessoa Armada':
+                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+            elif label == 'Arma':
+                frame = cv2.putText(frame, f'{label}: {conf:.2f}', (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=2, lineType=cv2.LINE_AA)
+                
 
     return frame
 

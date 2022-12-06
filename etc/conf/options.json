@@ -4,14 +4,14 @@
     "folder": "/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames",
     "model": {
             "people_detection_model": "yolov5m6",
-            "weapon_model_file": "/home/rodolfo/desenvolvimento2/espaco_inteligente/servico_yolov5_main/src/is_weapons_detector/yolov5s.pt",
+            "weapon_model_file": "/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/weights/best.pt",
             "people_nms_conf": 0.58,
-            "weapon_nms_conf":0.4,
+            "weapon_nms_conf":0.05,
             "people_infer_img_size":1280,
             "weapon_infer_img_size":1280,
-            "weapon_class_names": ["Arma", "Pessoa Armada"],
+            "weapon_class_names": ["Arma"],
             "gpu":0,
-            "increase_image_percent":40
+            "increase_image_percent":20
     },
     "cameras": [
         {
