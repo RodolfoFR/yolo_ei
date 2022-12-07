@@ -263,7 +263,7 @@ def bounding_box(frame, detections, class_names, infer_conf):
     if len(detections) > 0:
         for xmin, ymin, xmax, ymax, conf, clf in detections:
 
-            thickness=5
+            thickness=4
 
             if conf <= infer_conf: continue
             
@@ -293,7 +293,7 @@ def bounding_box(frame, detections, class_names, infer_conf):
 
             frame = cv2.rectangle(frame, (xmin, ymin-15-text_size[1]), (xmin+text_size[0], ymin), color, cv2.FILLED)
 
-            frame = cv2.putText(frame, text, (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=color, thickness=thickness, lineType=cv2.LINE_AA)
+            frame = cv2.putText(frame, text, (xmin, ymin-15), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.9, color=(255,255,255), thickness=thickness, lineType=cv2.LINE_AA)
 
 
                 

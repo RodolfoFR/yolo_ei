@@ -172,11 +172,11 @@ while gpu_activated:
                 # draw bounding box in the frame
                 display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
 
-                detection_people = detector.detect_people(display_image, max_size, recording) # prediction people
+                #detection_people = detector.detect_people(display_image, max_size, recording) # prediction people
 
-                if not recording:
+                #if not recording:
                     # draw bounding box in the frame
-                    display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+                    #display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
                         
                             
                                        

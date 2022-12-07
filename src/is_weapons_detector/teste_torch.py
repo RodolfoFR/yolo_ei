@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import cv2
 import time
-from is_wire.core import Channel,Subscription, Message
+from is_wire.core import Channel,Subscription, Message, Logger
 from is_msgs.image_pb2 import Image
 from is_utils import load_options, bounding_box, to_image
 from weapons_detector import WeaponsDetector
@@ -23,6 +23,10 @@ def to_np(input_image):
 
 # variables
 
+op = load_options() # infos as broker uri, zipkin uri, paremeters of model and cameras
+
+detector = WeaponsDetector(op.model) 
+
 broker_uri = "amqp://guest:guest@localhost:5672"
 camera_id = 2 # select camera
 channel = Channel(broker_uri)
@@ -30,20 +34,16 @@ subscription = Subscription(channel=channel)
 subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
 
 # for puslish prediction images
-puslish_name = 'Images.YOLOv5'
-subscription_yolo = Subscription(channel=channel, name=puslish_name)
+#puslish_name = 'Images.YOLOv5'
+#subscription_yolo = Subscription(channel=channel, name=puslish_name)
 
-
-op = load_options() # infos as broker uri, zipkin uri, paremeters of model and cameras
-
-detector = WeaponsDetector(op.model) 
 
 # to determine fps  
 start_time = 0
 end_time = 1
 
 # If true recording the frames (bool)
-recording = True
+recording = False
 
 # If True activate the detector (bool)
 detector_activated = True
