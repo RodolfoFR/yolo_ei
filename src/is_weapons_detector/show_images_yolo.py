@@ -77,6 +77,7 @@ size = (2 * op.cameras[0].config.image.resolution.height,
 
 # empty array, but in the proper format
 full_image = np.zeros(size, dtype=np.uint8)
+#display_image  = np.zeros(size, dtype=np.uint8)
 
 
 
@@ -94,7 +95,7 @@ start_time = 0
 end_time = 1
 
 # If true recording the frames (bool)
-recording = False
+recording = True
 
 # If True activate the detector (bool)
 detector_activated = True
@@ -152,12 +153,12 @@ while gpu_activated:
                 i = int(i) # id of the camera
                 images[i] = cv2.imdecode(d, cv2.IMREAD_COLOR) # image numpy format
                     
-
-            place_images(full_image, images) # adjusts the full_image to receive the images
-            display_image = cv2.resize(full_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image 
+            display_image  = np.zeros(size, dtype=np.uint8)
+            place_images(display_image, images) # adjusts the full_image to receive the images
+            
 
             max_size = display_image.shape[1]
-            max_size = int(max_size / 2) # minimum size for prediction
+            #max_size = int(max_size / 2) # minimum size for prediction
 
             end_time = time.time() # end 
 
@@ -169,16 +170,16 @@ while gpu_activated:
             if detector_activated:
 
                 detection_weapons = detector.detect_weapons(display_image, max_size) # prediction weapons
-                # draw bounding box in the frame
+                # draw bounding box in the frame according weapon detector prediction
                 display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
 
-                #detection_people = detector.detect_people(display_image, max_size, recording) # prediction people
+                detection_people = detector.detect_people(display_image, max_size, recording) # prediction people, if recording already draws
 
-                #if not recording:
-                    # draw bounding box in the frame
-                    #display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+                if not recording:
+                    # draw bounding box in the frame according people detector prediction
+                    display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
                         
-                            
+            display_image = cv2.resize(display_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image      
                                        
             cv2.imshow('YOLO', display_image) # display images
             key = cv2.waitKey(1)

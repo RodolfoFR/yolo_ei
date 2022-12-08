@@ -32,7 +32,7 @@ else:
             if len(file) > 0:
                 n_files += 1
 
-        for i in range(1, n_files+1):
+        for i in range(3, n_files+1, 4):
 
             if i == 1:
 

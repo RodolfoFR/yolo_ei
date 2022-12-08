@@ -28,7 +28,7 @@ op = load_options() # infos as broker uri, zipkin uri, paremeters of model and c
 detector = WeaponsDetector(op.model) 
 
 broker_uri = "amqp://guest:guest@localhost:5672"
-camera_id = 2 # select camera
+camera_id = 1 # select camera
 channel = Channel(broker_uri)
 subscription = Subscription(channel=channel)
 subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
@@ -39,8 +39,8 @@ subscription.subscribe(topic='CameraGateway.{}.Frame'.format(camera_id))
 
 
 # to determine fps  
-start_time = 0
-end_time = 1
+start_time = 1
+end_time = 0
 
 # If true recording the frames (bool)
 recording = False
