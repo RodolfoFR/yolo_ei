@@ -20,8 +20,29 @@ else:
 
     else:
 
-        op = load_options()
-        detector = WeaponsDetector(op.model)
-        video = cv2.VideoCapture(path_video)
+        op = load_options() # load parameters
+        detector = WeaponsDetector(op.model) 
+        video = cv2.VideoCapture(path_video) 
+
+        while video.isOpened(): # when video is opened
+
+            ret, frame = video.read() # get frames from video
+
+            max_size = frame.shape[1] # max size for detect
+
+            detection_weapons = detector.detect_weapons(frame, max_size) # weapon prediction
+            # draw bounding box in the frame, according prediction
+            frame = bounding_box(frame, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf) 
+            
+            detection_people = detector.detect_people(frame, max_size) # people prediction
+            # draw bounding box in the frame, according prediction
+            frame = bounding_box(frame, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+            
+            cv2.imshow("Yolo", video) # display frames
+            key = cv2.waitKey(1)
+
+
+video.release() # close video file
+cv2.destroyAllWindows() # destroy all windows cv2
 
         
