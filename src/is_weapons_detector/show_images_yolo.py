@@ -94,11 +94,14 @@ rod = False
 start_time = 0
 end_time = 1
 
+video_name = random_hex_id()
+id_frame_save = 0
+
 # If true recording the frames (bool)
 recording = True
 
 # If True activate the detector (bool)
-detector_activated = True
+detector_activated = False
 
 gpu_activated = torch.cuda.is_available() # check if GPU is avaiable (bool)
 
@@ -112,6 +115,8 @@ else:
 
 # only runs when GPU is on     
 while gpu_activated:
+
+    start_time = time.time()
    
     # parametro return_dropped=True serve alem de receber a messagem receber o dropped
     # consume a mensagem  
@@ -138,9 +143,7 @@ while gpu_activated:
     images_data[camera_id] = im_np
     
 
-            
-            
-        
+                
     # check if there are the same amount of images and cameras
     if len(images_data) == len(op.cameras): 
 
@@ -155,36 +158,46 @@ while gpu_activated:
                     
             display_image  = np.zeros(size, dtype=np.uint8)
             place_images(display_image, images) # adjusts the full_image to receive the images
+  
             
 
             max_size = display_image.shape[1]
-            #max_size = int(max_size / 2) # minimum size for prediction
+            max_size = int(max_size / 2) # minimum size for prediction
+
+            
+
+            if detector_activated:
+
+                detection_weapons = detector.detect_weapons(display_image, max_size) # prediction weapons
+                # draw bounding box in the frame according weapon detector prediction
+                display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf, weapon=True)
+
+                detection_people = detector.detect_people(display_image, max_size) # prediction people
+                # draw bounding box in the frame according weapon detector prediction
+                display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+               
+                            
 
             end_time = time.time() # end 
 
             fps = int( 1 / (end_time - start_time) ) # fps of video 
 
             # write the fps in the frames
-            display_image = cv2.putText(display_image, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
-
-            if detector_activated:
-
-                detection_weapons = detector.detect_weapons(display_image, max_size) # prediction weapons
-                # draw bounding box in the frame according weapon detector prediction
-                display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf)
-
-                detection_people = detector.detect_people(display_image, max_size, recording) # prediction people, if recording already draws
-
-                if not recording:
-                    # draw bounding box in the frame according people detector prediction
-                    display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
-                        
-            display_image = cv2.resize(display_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image      
+            display_image = cv2.putText(display_image, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)    
                                        
+            display_image = cv2.resize(display_image, (0, 0), fx=0.5, fy=0.5) # ajusted final image
+
+            if recording:
+                # save frames
+                cv2.imwrite(f'/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/Videos/frames/{video_name}-{id_frame_save}.jpg', display_image)
+                id_frame_save += 1
+            
+            
+
             cv2.imshow('YOLO', display_image) # display images
             key = cv2.waitKey(1)
 
-            start_time = time.time()
+           
                     
 
             if key == 'q':

@@ -5,7 +5,7 @@
     "model": {
             "people_detection_model": "yolov5m6",
             "weapon_model_file": "/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/weights/best.pt",
-            "people_nms_conf": 0.58,
+            "people_nms_conf": 0.60,
             "weapon_nms_conf":0.10,
             "people_infer_img_size":1280,
             "weapon_infer_img_size":1280,

@@ -90,8 +90,9 @@ def load_options():
     # Se sys.arv tiver algum arguemento, então op_file é primeiro argumento da chamada
     # Se não op_file é o arquivo options.json que está em etc/conf
     # op_file é para ser um arq que passa ip das cameras(espaço), ip do zipkin_uri e os paramentros do modelo
-    op_file = sys.argv[1] if len(sys.argv) > 1 else '/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/etc/conf/options.json'
-   
+    #op_file = sys.argv[1] if len(sys.argv) > 1 else '/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/etc/conf/options.json'
+    op_file = '/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/etc/conf/options.json'
+
     try:
     # f = op_file, f abre op_file para leitura
         with open(op_file, 'r') as f:
@@ -246,7 +247,7 @@ def prepare_to_display(img, new_shape=(640, 640), color=114, title = None, borde
     return img_border, ratio, (dw, dh)
 
 
-def bounding_box(frame, detections, class_names, infer_conf):
+def bounding_box(frame, detections, class_names, infer_conf, weapon = False):
     """
     Create a bounfing box in the frame, according yolo prediction
     Using cv2
@@ -272,8 +273,13 @@ def bounding_box(frame, detections, class_names, infer_conf):
             xmax = int(xmax)
             ymax = int(ymax)
 
+            if weapon:
+                increase_id = 1
+            else:
+                increase_id = 0
 
-            label = class_names[int(clf)]
+
+            label = class_names[int(clf)+increase_id]
 
             if label == "person":
                 color  = (0,0,144)

@@ -18,7 +18,7 @@ class WeaponsDetector:
         # esse modelo é do pessoal da yolo, vem de torch.hub
         # WeaponsDetector.people_detector
         
-        self.people_detector = torch.hub.load('ultralytics/yolov5', "yolov5s",autoshape=True, pretrained=True, force_reload=True)
+        self.people_detector = torch.hub.load('ultralytics/yolov5', "yolov5n",autoshape=True, pretrained=True, force_reload=True)
        
         # people_detector só tem uma classe que deve se pessoa
         # WeaponsDetector.people_detector.classes
@@ -55,6 +55,7 @@ class WeaponsDetector:
         self.weapons_detector.conf = model_conf.weapon_nms_conf
        
         # joga o modelo weapons_detector para o device
+        
         self.weapons_detector = self.weapons_detector.to(device)
        
         # recebe model_conf.people_infer_img_size (argurmento da classe), acho que é tamanho para bbox detectar, valor minimo aceitavél
@@ -67,7 +68,7 @@ class WeaponsDetector:
         self.class_names = ["person"] + list(model_conf.weapon_class_names)
  
 
-    def detect_weapons(self, image, max_size, save=False):
+    def detect_weapons(self, image, max_size):
 
         """
         Detect weapons in the image
@@ -81,21 +82,16 @@ class WeaponsDetector:
         """
 
         weapons = self.weapons_detector(image, max_size)
-        if save:
-            weapons.save(save_dir='/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames')
-        weapons = np.array(weapons.xyxy[0].cpu().numpy())
 
-        # change the index class, weapon = 1, person weapons = 2
-        for i in range(len(weapons)): 
-            weapons[i][5] = weapons[i][5] + 1
+        weapons = weapons.xyxy[0] # prediction tensor
             
-
         return weapons
 
+
     
 
     
-    def detect_people(self, image, max_size, save=False):
+    def detect_people(self, image, max_size):
 
         """
         Detect people in the image
@@ -109,9 +105,8 @@ class WeaponsDetector:
         """
 
         people = self.people_detector(image, max_size)
-        if save:
-            people.save(save_dir='/home/rodolfo/desenvolvimento2/espaco_inteligente/yolo_ei/src/is_weapons_detector/videos_yolo/frames')
-        people = np.array(people.xyxy[0].cpu().numpy()) #.astype(int)
+        
+        people = people.xyxy[0] #.astype(int)
         return people
 
 
@@ -120,3 +115,4 @@ class WeaponsDetector:
         print(f'cuda is {torch.cuda.is_available()}')
         
 
+    
