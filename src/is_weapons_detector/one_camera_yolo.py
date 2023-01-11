@@ -63,46 +63,49 @@ else:
     device = 'cuda:0'
 
 
+if __name__ == '__main__':
 
-# only runs when GPU is on 
-while gpu_activated:
+    # only runs when GPU is on 
+    while gpu_activated:
 
-    start_time = time.time()
-    msg = channel.consume() # consume message from channel 
-    im = msg.unpack(Image) # unpack Image format (Image)
-    frame = to_np(im) # Image for numpay (np.ndarray)
+        start_time = time.time()
+        msg = channel.consume() # consume message from channel 
+        im = msg.unpack(Image) # unpack Image format (Image)
+        frame = to_np(im) # Image for numpay (np.ndarray)
 
-    
-    max_size = frame.shape[1] # max size of prediction
-
-
-    
-    
-    if detector_activated:
-
-        detection_weapons = detector.detect_weapons(frame, max_size) # prediction weapons
-        # draw bounding box in the frame
-        frame = bounding_box(frame, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf, weapon=True)
-
-        detection_people = detector.detect_people(frame, max_size) # prediction people
-
-        # draw bounding box in the frame
-        display_image = bounding_box(frame, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
-
-    end_time = time.time()
+        
+        max_size = frame.shape[1] # max size of prediction
 
 
-    fps = int( 1 / (end_time - start_time) ) # fps of video
+        
+        
+        if detector_activated:
 
-     # write the fps in the frames
-    display_image = cv2.putText(frame, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
+            detection_weapons = detector.detect_weapons(frame, max_size) # prediction weapons
+            # draw bounding box in the frame
+            frame = bounding_box(frame, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf, weapon=True)
+
+            detection_people = detector.detect_people(frame, max_size) # prediction people
+
+            # draw bounding box in the frame
+            display_image = bounding_box(frame, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+
+        end_time = time.time()
 
 
-    cv2.imshow('YOLO', frame) # display images
-    key = cv2.waitKey(1)
+        fps = int( 1 / (end_time - start_time) ) # fps of video
 
-    start_time = time.time()
+        # write the fps in the frames
+        display_image = cv2.putText(frame, f'fps: {fps}', (5, 25), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(250,250,250), thickness=2, lineType=cv2.LINE_AA)
 
+
+        cv2.imshow('YOLO', frame) # display images
+        key = cv2.waitKey(1)
+
+        start_time = time.time()
+
+        if key == 'q':
+            break
    
 
 

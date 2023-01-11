@@ -13,6 +13,7 @@ from conf.msgs_pb2 import Image
 from is_wire.core import Logger, Subscription, Message, Tracer, Channel
 
 from weapons_detector import WeaponsDetector
+from people_detector import PeopleDetector
 from is_utils import load_options, create_exporter, get_topic_id,  to_image, to_np, annotate_image, bounding_box, random_hex_id, save_video
 from stream_channel import StreamChannel
 
@@ -46,8 +47,8 @@ op = load_options()
    
 # detector vai ser da classe WeaponsDetector que vem de weapons_detector.py, Rede para classificar
 # que tem como parametro op.model, que sao os parametro do modelo (vai ter os pesos)
-detector = WeaponsDetector(op.model)
-
+weapon_detector = WeaponsDetector(op.model)
+people_detector = PeopleDetector(op.model)
 
 # StreamChannel eh uma classe que vem de stream_channel.py
 # eh parecido com Channel do is_wire.core
@@ -98,10 +99,10 @@ video_name = random_hex_id()
 id_frame_save = 0
 
 # If true recording the frames (bool)
-recording = True
+recording = False
 
 # If True activate the detector (bool)
-detector_activated = False
+detector_activated = True
 
 gpu_activated = torch.cuda.is_available() # check if GPU is avaiable (bool)
 
@@ -168,13 +169,13 @@ while gpu_activated:
 
             if detector_activated:
 
-                detection_weapons = detector.detect_weapons(display_image, max_size) # prediction weapons
+                detection_weapons = weapon_detector.detect(display_image, max_size) # prediction weapons
                 # draw bounding box in the frame according weapon detector prediction
-                display_image = bounding_box(display_image, detections=detection_weapons, class_names=detector.class_names, infer_conf=detector.weapons_detector.conf, weapon=True)
+                display_image = bounding_box(display_image, detections=detection_weapons, class_names=weapon_detector.class_name, infer_conf=weapon_detector.detector.conf)
 
-                detection_people = detector.detect_people(display_image, max_size) # prediction people
+                detection_people = people_detector.detect(display_image, max_size) # prediction people
                 # draw bounding box in the frame according weapon detector prediction
-                display_image = bounding_box(display_image, detections=detection_people, class_names=detector.class_names, infer_conf=detector.people_detector.conf)
+                display_image = bounding_box(display_image, detections=detection_people, class_names=people_detector.class_name, infer_conf=people_detector.detector.conf)
                
                             
 

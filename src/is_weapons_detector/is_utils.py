@@ -247,7 +247,7 @@ def prepare_to_display(img, new_shape=(640, 640), color=114, title = None, borde
     return img_border, ratio, (dw, dh)
 
 
-def bounding_box(frame, detections, class_names, infer_conf, weapon = False):
+def bounding_box(frame, detections, class_names, infer_conf):
     """
     Create a bounfing box in the frame, according yolo prediction
     Using cv2
@@ -273,13 +273,10 @@ def bounding_box(frame, detections, class_names, infer_conf, weapon = False):
             xmax = int(xmax)
             ymax = int(ymax)
 
-            if weapon:
-                increase_id = 1
-            else:
-                increase_id = 0
+            
 
 
-            label = class_names[int(clf)+increase_id]
+            label = class_names[0]
 
             if label == "person":
                 color  = (0,0,144)
